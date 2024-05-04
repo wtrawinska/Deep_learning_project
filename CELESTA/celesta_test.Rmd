@@ -1,0 +1,83 @@
+---
+title: "Getting to know CELESTA"
+output: pdf_document
+date: "2024-05-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(CELESTA)
+library(Rmixmod)
+library(spdep)
+library(ggplot2)
+library(reshape2)
+library(zeallot)
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+print(getwd())
+writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
+```
+
+## Function running celesta 
+ Function based on CELESTA README on github (https://github.com/plevritis-lab/CELESTA/blob/main/README.md)
+
+```{r}
+run_celesta <- function(marker_info_file, imaging_data_file, proj_title=NULL) {
+  prior_marker_info <- read.csv(marker_info_file)
+  imaging_data <- read.csv(imaging_data_file)
+  colnames(prior_marker_info)[1] <-""
+  if(is.null(proj_title)) proj_title <- tail(strsplit(strsplit(imaging_data_file, "[.]")[[1]][1], "[/]")[[1]], n=1)
+  CelestaObj <- CreateCelestaObject(project_title = proj_title,prior_marker_info,imaging_data)
+  CelestaObj <- FilterCells(CelestaObj,high_marker_threshold=0.9, low_marker_threshold=0.4)
+  
+  CelestaObj <- AssignCells(CelestaObj,max_iteration=10,cell_change_threshold=0.01,
+                            high_expression_threshold_anchor=high_marker_threshold_anchor,
+                            low_expression_threshold_anchor=low_marker_threshold_anchor,
+                            high_expression_threshold_index=high_marker_threshold_iteration,
+                            low_expression_threshold_index=low_marker_threshold_iteration)
+}
+```
+
+## CELESTA on data provided on CELESTA github 
+1. prior marker info: https://github.com/plevritis-lab/CELESTA/blob/main/data/prior_marker_info.csv
+2. imaging data: https://github.com/plevritis-lab/CELESTA/blob/main/data/imaging_data.csv
+
+```{r}
+img_path <- "data/celesta_org_data/imaging_data.csv"
+marker_info_path <- "data/celesta_org_data/prior_marker_info.csv"
+
+run_celesta(marker_info_path, img_path, proj_title = "celesta_on celesta_data")
+```
+
+## CELESTA on a subset of our data 
+
+```{r}
+img_path_1 <- "data/exprs_data/IMMUcan_Batch20220908_S-220729-00002_002_roi_2.csv"
+marker_info_path_1 <- "data/marker_info_data/markers_table_same_round.csv"
+
+run_celesta(marker_info_path_1, img_path_1)
+```
+
+The marker info had lineage level corresponding to considering all cell types in the same round (probably does not make sense):
+```{r}
+read.csv(marker_info_path_1)
+```
+
+Celesta output:
+```{r}
+
+celesta_out_1 <- paste(tail(strsplit(strsplit(img_path_1, "[.]")[[1]][1], "[/]")[[1]], n=1), "final_cell_type_assignment.csv",sep="_")
+print(celesta_out_1)
+celesta_out_1 <- read.csv(celesta_out_1)
+head(celesta_out_1)
+```
+
+```{r}
+print("Assigned cells stats")
+table(celesta_out_1$Final.cell.type)
+```
+
+
