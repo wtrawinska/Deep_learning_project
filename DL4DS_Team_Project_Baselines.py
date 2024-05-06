@@ -83,7 +83,7 @@ def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_s
         y_pred = clf.predict(X)
         y_pred_proba = clf.predict_proba(X)
         print(classification_report(y, y_pred))
-        mxs.append(confusion_matrix(y, y_pred))
+        mxs.append(confusion_matrix(y, y_pred, normalize='true'))
         print(f"ROC: {roc_auc_score(y, y_pred_proba, multi_class='ovr')}")
         print(f"Acc: {accuracy_score(y, y_pred)}")
         print(f"Precision: {precision_score(y, y_pred, average='macro')}")
