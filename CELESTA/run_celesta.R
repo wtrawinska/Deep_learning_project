@@ -8,9 +8,9 @@ library(zeallot)
 run_celesta <- function(marker_info_file, imaging_data_file, proj_title=NULL,
                         filter_cells=FALSE,
                         max_iteration=10,cell_change_threshold=0.01,
-                        high_expression_threshold_anchor=rep(0.7, length=13),
+                        high_expression_threshold_anchor=rep(0.5, length=13),
                         low_expression_threshold_anchor=rep(0.9, length=13),
-                        high_expression_threshold_index=rep(0.5, length=13),
+                        high_expression_threshold_index=rep(0.4, length=13),
                         low_expression_threshold_index=rep(1, length=13)) {
   prior_marker_info <- read.csv(marker_info_file)
   imaging_data <- read.csv(imaging_data_file)
