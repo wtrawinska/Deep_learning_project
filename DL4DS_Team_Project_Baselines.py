@@ -1,6 +1,6 @@
 import argparse
 import itertools
-#!pip install anndata
+#!pip install ann
 #!pip install delayedarray
 #!pip install pyometiff
 
@@ -94,6 +94,24 @@ def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_s
     return mxs, rets
 
 
+def create_data(ann, true_vals=True):
+    ann = anndata.read_h5ad(ann)
+
+    if true_vals:
+        data_set = np.c_[np.arcsinh(ann.layers['exprs'] / 5.), ann.obs[
+            ['area', 'major_axis_length', 'minor_axis_length', 'eccentricity']],  # Training features
+        ann.obs['cell_labels'].astype('category')]  # Features to be predicted, changed to int values
+        data_set = pd.DataFrame(data_set)
+        data_set.columns = [*data_set.columns[:-1],
+                            'type']  # Naming the last column as 'type', can be whatever, but must be consistent with `predicts` argument of cv
+    else:
+        data_set = np.c_[np.arcsinh(ann.layers['exprs'] / 5.), ann.obs[
+            ['area', 'major_axis_length', 'minor_axis_length', 'eccentricity']],  # Training features
+        ]  # Features to be predicted, changed to int values
+        data_set = pd.DataFrame(data_set)
+    return ann, data_set
+
+
 def save_base(bases):
     for i, baseline in enumerate(bases):
         with open(f'baseline_{i + 1}_{type(classifiers[i]).__name__}.pkl', 'wb') as f:
@@ -109,8 +127,9 @@ def load_base(path='baseline_2_GradientBoostingClassifier.pkl'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--path_to_folder', '-p', type=str, default='./')
+    args = parser.parse_args()
     # drive.mount('/content/drive') # use if you plan to use colab.
-    PATH_TO_FOLDER = './'
+    PATH_TO_FOLDER = args.path_to_folder
     TRAIN_DATA_PATH = 'train'
     ORIGINAL_IMAGE_DATA_SUBDIR = 'images_masks'
     ORIGINAL_MASKS_SUBDIR = 'masks'
@@ -125,18 +144,11 @@ if __name__ == '__main__':
     TRAIN_IMAGE_DATA_IMAGES = os.path.join(TRAIN_IMAGE_DATA_DIR, ORIGINAL_IMAGES_SUBDIR)
     TRAIN_IMAGE_DATA_MASKS = os.path.join(TRAIN_IMAGE_DATA_DIR, ORIGINAL_MASKS_SUBDIR)
 
-    train_anndata = anndata.read_h5ad(TRAIN_ANNDATA_PATH)
 
     classifiers = [LogisticRegression(max_iter=10000, verbose=False, n_jobs=4), GradientBoostingClassifier(),
                    MLPClassifier(max_iter=10000)]
 
-    data_set = np.c_[np.arcsinh(train_anndata.layers['exprs'] / 5.), train_anndata.obs[
-        ['area', 'major_axis_length', 'minor_axis_length', 'eccentricity']],  # Training features
-    train_anndata.obs['cell_labels'].astype('category')]  # Features to be predicted, changed to int values
-    data_set = pd.DataFrame(data_set)
-    data_set.columns = [*data_set.columns[:-1],
-                        'type']  # Naming the last column as 'type', can be whatever, but must be consistent with `predicts` argument of cv
-
+    train_anndata, data_set = create_data(TRAIN_ANNDATA_PATH)
     matrices, baselines = cv(data_set, classifiers, num_splits=1)  # Training and validating
 
     ticks = train_anndata.obs['cell_labels'].astype('category').cat.categories
