@@ -121,6 +121,8 @@ Prediction results for CELESTA:
     - Tumor: 0.9044303222877894
     - pDC: 0.05301645338208409
     - plasma: 0.8018583042973287
+    
+95.2 % of BnT cells were predicted as B cells or T cells
 
 ## Baselines
 ### Training

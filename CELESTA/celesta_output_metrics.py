@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import (average_precision_score, roc_auc_score, accuracy_score, precision_score,
@@ -18,6 +19,9 @@ def evaluate_celesta_output(csv_file):
     cell_labels = y_true.unique()
     cell_labels.sort()
     matrix = confusion_matrix(y_true, y_pred, labels=cell_labels)
+    matrix_df = pd.DataFrame(matrix, columns = cell_labels)
+    matrix_df["true"] = cell_labels
+    matrix_df.set_index("true", inplace=True)
     print("#############")
     print(f"Per type accuracy:")
     for i in [f'{cell_labels[i]}: {x}' for i, x in enumerate(matrix.diagonal() / matrix.sum(axis=1))]:
@@ -34,6 +38,8 @@ def evaluate_celesta_output(csv_file):
     print(f"ROC AUC per cell type score:")
     for i in [f'{cell_labels[i]}: {x}' for i, x in enumerate(roc_auc_score(y_true, y_score, multi_class='ovr', average=None, labels=list(cell_labels)))]:
         print(i)
+    print("#############")
+    print(f'{round(matrix_df.loc["BnT", ["B", "CD4", "CD8", "Treg"]].sum() / matrix_df.loc["BnT", :].sum() * 100, 2)} % of BnT cells were predicted as B cells or T cells')
 
 def main():
     parser = argparse.ArgumentParser(description="""
