@@ -24,6 +24,11 @@ def evaluate_celesta_output(csv_file):
         print(i)
     print("#############")
     print(f"Precision score: {precision_score(y_true, y_pred, average='macro')}")
+    print("#############")
+    print(f"Per type precision:")
+    for i in [f'{cell_labels[i]}: {x}' for i, x in enumerate(matrix.diagonal() / matrix.sum(axis=0))]:
+        print(i)
+    print("#############")
     print(f"Recall score: {recall_score(y_true, y_pred, average='macro')}")
     y_score = OneHotEncoder().fit_transform(y_pred.to_numpy().reshape(-1, 1)).toarray()
     print(f"ROC AUC per cell type score:")
