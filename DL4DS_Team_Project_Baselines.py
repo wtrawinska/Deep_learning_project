@@ -18,7 +18,7 @@ import anndata
 import pickle
 
 
-def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_seed=1):
+def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_seed=1, test_par=False):
     """
     This function trains and validates the classification models on a dataset, with possibility of predicting on a test set, as well as conducting a cross validation.
     :param dataset: Training dataset in the form of pd.DataFrame
@@ -33,12 +33,12 @@ def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_s
     np.random.seed(random_seed)  # Set random seed
 
     print('#' * 160)
-
-    msk = (np.random.rand(len(dataset)) < .8) if test_set is None else (np.random.rand(len(dataset)) < .0)
-    valid = dataset[~msk]
-    dataset = dataset[msk]
-    if test_set is not None:
-        valid = test_set
+    if test_par:
+        msk = (np.random.rand(len(dataset)) < .8) if test_set is None else (np.random.rand(len(dataset)) < .0)
+        valid = dataset[~msk]
+        dataset = dataset[msk]
+        if test_set is not None:
+            valid = test_set
     mxs = []
     rets = []
 
@@ -72,26 +72,28 @@ def cv(dataset, classifs, num_splits=1, predicts='type', test_set=None, random_s
                 y_pred = []
                 ret = [1]
             clfs.append((classifier, y_test, y_pred))
-
-        X, y = valid.loc[:, valid.columns != predicts], valid.loc[:, predicts]
-        if num_splits > 1:
-            print(f"mean ROC: {np.mean(ret)}, std: {np.std(ret)}")
-            print(f"maximum ROC: {np.max(ret)} ")
-            print("Beneath are the results for the model with the highest ROC")
+        y_pred = None
+        y_pred_proba = None
         clf = clfs[np.argmax(ret)][0]
         rets.append(clf)
-        y_pred = clf.predict(X)
-        y_pred_proba = clf.predict_proba(X)
-        print(classification_report(y, y_pred))
-        mxs.append(confusion_matrix(y, y_pred, normalize='true'))
-        print(f"ROC: {roc_auc_score(y, y_pred_proba, multi_class='ovr')}")
-        print(f"Acc: {accuracy_score(y, y_pred)}")
-        print(f"Precision: {precision_score(y, y_pred, average='macro')}")
-        print(f"Recall: {recall_score(y, y_pred, average='macro')}")
-        print(f"Macro F1: {f1_score(y, y_pred, average='macro')}")
+        if test_par or test_set is not None:
+            X, y = valid.loc[:, valid.columns != predicts], valid.loc[:, predicts]
+            if num_splits > 1:
+                print(f"mean ROC: {np.mean(ret)}, std: {np.std(ret)}")
+                print(f"maximum ROC: {np.max(ret)} ")
+                print("Beneath are the results for the model with the highest ROC")
+            y_pred = clf.predict(X)
+            y_pred_proba = clf.predict_proba(X)
+            print(classification_report(y, y_pred))
+            mxs.append(confusion_matrix(y, y_pred, normalize='true'))
+            print(f"ROC: {roc_auc_score(y, y_pred_proba, multi_class='ovr')}")
+            print(f"Acc: {accuracy_score(y, y_pred)}")
+            print(f"Precision: {precision_score(y, y_pred, average='macro')}")
+            print(f"Recall: {recall_score(y, y_pred, average='macro')}")
+            print(f"Macro F1: {f1_score(y, y_pred, average='macro')}")
 
         print('#' * 160, '\n')
-    return mxs, rets
+    return mxs, rets, y_pred_proba, y_pred
 
 
 def create_data(ann, true_vals=True):
@@ -114,7 +116,7 @@ def create_data(ann, true_vals=True):
 
 def save_base(bases):
     for i, baseline in enumerate(bases):
-        with open(f'baseline_{i + 1}_{type(classifiers[i]).__name__}.pkl', 'wb') as f:
+        with open(f'baseline_{i + 1}_{type(classifiers[i]).__name__}.pkl', 'wb+') as f:
             pickle.dump(baseline, f)
 
 
@@ -125,8 +127,9 @@ def load_base(path='baseline_2_GradientBoostingClassifier.pkl'):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Runs baseline training and classification on training data.")
     parser.add_argument('--path_to_folder', '-p', type=str, default='./', help='Path to folder with data')
+    parser.add_argument('--test_split', action='store_true', help="Flag if you want to run validation split")
     parser.add_argument("--seed", '-s', type=int, default=1, help="Random seed")
     args = parser.parse_args()
     # drive.mount('/content/drive') # use if you plan to use colab.
@@ -150,27 +153,30 @@ if __name__ == '__main__':
                    MLPClassifier(max_iter=10000)]
 
     train_anndata, data_set = create_data(TRAIN_ANNDATA_PATH)
-    matrices, baselines = cv(data_set, classifiers, num_splits=1, random_seed=args.seed)  # Training and validating
-
-    ticks = train_anndata.obs['cell_labels'].astype('category').cat.categories
-    fig, axs = plt.subplots(1, len(classifiers))
-    for i in range(len(classifiers)):
-        im = axs[i].imshow(matrices[i])
-        axs[i].set_title(f"{type(classifiers[i]).__name__}")
-        axs[i].set_xticks(range(len(ticks)))
-        axs[i].set_yticks(range(len(ticks)))
-        axs[i].set_xticklabels(ticks, rotation=90)
-        axs[i].set_yticklabels(ticks)
-
-    fig.set_figwidth(20)
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-    fig.colorbar(im, cax=cbar_ax)
-
-    plt.show()
+    matrices, baselines, probs, preds = cv(data_set, classifiers, num_splits=1, random_seed=args.seed, test_par=args.test_split)  # Training and validating
 
     # Saving baselines:
     save_base(baselines)
+
+
+    if args.test_split:
+        ticks = train_anndata.obs['cell_labels'].astype('category').cat.categories
+        fig, axs = plt.subplots(1, len(classifiers))
+        for i in range(len(classifiers)):
+            im = axs[i].imshow(matrices[i])
+            axs[i].set_title(f"{type(classifiers[i]).__name__}")
+            axs[i].set_xticks(range(len(ticks)))
+            axs[i].set_yticks(range(len(ticks)))
+            axs[i].set_xticklabels(ticks, rotation=90)
+            axs[i].set_yticklabels(ticks)
+
+        fig.set_figwidth(20)
+        fig.subplots_adjust(right=0.8)
+        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        fig.colorbar(im, cax=cbar_ax)
+
+        plt.show()
+
 
     # Example how to use baselines:
 
