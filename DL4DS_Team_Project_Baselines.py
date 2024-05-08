@@ -126,7 +126,8 @@ def load_base(path='baseline_2_GradientBoostingClassifier.pkl'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path_to_folder', '-p', type=str, default='./')
+    parser.add_argument('--path_to_folder', '-p', type=str, default='./', help='Path to folder with data')
+    parser.add_argument("--seed", '-s', type=int, default=1, help="Random seed")
     args = parser.parse_args()
     # drive.mount('/content/drive') # use if you plan to use colab.
     PATH_TO_FOLDER = args.path_to_folder
@@ -149,7 +150,7 @@ if __name__ == '__main__':
                    MLPClassifier(max_iter=10000)]
 
     train_anndata, data_set = create_data(TRAIN_ANNDATA_PATH)
-    matrices, baselines = cv(data_set, classifiers, num_splits=1)  # Training and validating
+    matrices, baselines = cv(data_set, classifiers, num_splits=1, random_seed=args.seed)  # Training and validating
 
     ticks = train_anndata.obs['cell_labels'].astype('category').cat.categories
     fig, axs = plt.subplots(1, len(classifiers))

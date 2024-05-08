@@ -25,8 +25,9 @@ def main(model, data_path, true_vals):
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--path_to_model', type=str, default='./baseline_2_GradientBoostingClassifier.pkl')
-    arg_parser.add_argument('--path_to_data', type=str, default='./train/cell_data.h5ad')
+    arg_parser.add_argument('--path_to_model', type=str, default='./baseline_2_GradientBoostingClassifier.pkl',
+                            help='Path to saved model')
+    arg_parser.add_argument('--path_to_data', type=str, default='./train/cell_data.h5ad', help='Path to data file')
     arg_parser.add_argument('--no_labels', action='store_false', help="Flag if there is no labels in the dataset.")
 
     args = arg_parser.parse_args()
