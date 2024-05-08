@@ -46,6 +46,63 @@ options:
   -h, --help        show this help message and exit
 
 ```
+Usage example:
+```
+python3 celesta.py ~/Downloads/cell_data.h5ad data/celesta_input_final data/final_signature.csv celesta_out
+```
+
+To get the metrics for CELESTA output, one needs to run `celesta_output_metrics.py`
+
+```
+usage: celesta_output_metrics.py [-h] celesta_output
+
+Calculates metrics for celesta output evaluation.
+
+positional arguments:
+  celesta_output  path to merged celesta outputs
+
+options:
+  -h, --help      show this help message and exit
+```
+### Metrics calculated for CELESTA
+
+Prediction results for CELESTA:
+1. F1 macro score: 0.3459172731647878
+2. Accuracy score: 0.5876405775557348
+
+3. Per type accuracy:
+    - B: 0.6886641830761043
+    - BnT: 0.0
+    - CD4: 0.44647641234711705
+    - CD8: 0.5706902696922894
+    - DC: 0.1356437915997246
+    - HLADR: 0.75625
+    - MacCD163: 0.27277628032345014
+    - Mural: 0.788136285644252
+    - NK: 0.27967479674796747
+    - Neutrophil: 0.06343656343656344
+    - Treg: 0.6409605622803592
+    - Tumor: 0.8855220351638193
+    - pDC: 0.36325678496868474
+    - plasma: 0.5718071890011596
+
+4. Recall score: 0.3378122372524154
+
+5. ROC AUC per cell type score:
+    - B: 0.7614760866005604
+    - BnT: 0.647494130923578
+    - CD4: 0.47577485424605276
+    - CD8: 0.5008067070570508
+    - DC: 0.7174014319505817
+    - HLADR: 0.4912937753712475
+    - MacCD163: 0.49389007305465704
+    - Mural: 0.4993243935850006
+    - NK: 0.4994547437295529
+    - Neutrophil: 0.49172526937709793
+    - Treg: 0.2868509539766997
+    - Tumor: 0.39923771514231404
+    - pDC: 0.6374965280553889
+    - plasma: 0.7189946850296984
 
 ## Baselines
 ### Training
