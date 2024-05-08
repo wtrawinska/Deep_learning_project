@@ -3,8 +3,9 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from DL4DS_Team_Project_Baselines import (load_base, create_data, roc_auc_score, accuracy_score, precision_score,
-                                          recall_score, f1_score, confusion_matrix)
+from DL4DS_Team_Project_Baselines import load_base, create_data
+from sklearn.metrics import (average_precision_score, roc_auc_score, accuracy_score, precision_score,
+                             recall_score, f1_score, confusion_matrix)
 
 
 def main(model, data_path, true_vals):
@@ -29,7 +30,12 @@ def main(model, data_path, true_vals):
         print("#############")
         print(f"Precision score: {precision_score(y_true, y_pred, average='macro')}")
         print(f"Recall score: {recall_score(y_true, y_pred, average='macro')}")
-        print(f"ROC AUC score: {roc_auc_score(y_true, y_pred_proba, multi_class='ovr')}")
+        print(f"ROC AUC per cell type score:")
+        for i in [f'{model.classes_[i]}: {x}' for i, x in enumerate(roc_auc_score(y_true, y_pred_proba, multi_class='ovr', average=None))]:
+            print(i)
+        print(f"Average Precision  per cell type score:")
+        for i in [f'{model.classes_[i]}: {x}' for i, x in enumerate(average_precision_score(y_true, y_pred_proba, average=None))]:
+            print(i)
     return y_pred, y_pred_proba, model.classes_
 
 
