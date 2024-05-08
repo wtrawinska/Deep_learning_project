@@ -1,0 +1,16 @@
+celltype,HLADR,CD15,CD11c,CD4,PDL1,CD20,LAG3,PDGFRb,ICOS,CD3,CD68,CD45RO,CD206,CD16,CD163,Ecad,GrzB,CD45RA,CD38,cleavedPARP,CD27,CD8a,FOXP3,Ki67,CarbonicAnhydrase,CD7,SMA,PD1,CD14
+MacCD163,higher,none,higher,higher,none,none,none,none,none,none,higher,none,higher,higher,higher,lower,none,none,none,none,none,none,none,none,none,none,none,none,higher
+Mural,lower,lower,lower,lower,lower,lower,lower,higher,lower,lower,lower,lower,none,lower,none,lower,lower,lower,lower,lower,lower,lower,lower,lower,lower,lower,higher,lower,none
+DC,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+Tumor,none,none,none,none,none,none,none,lower,none,lower,lower,lower,none,lower,lower,higher,none,none,none,none,none,none,none,none,higher,none,lower,none,none
+CD4,none,none,none,higher,none,none,none,none,none,higher,none,higher,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+HLADR,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+NK,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+CD8,none,none,none,none,none,none,none,none,none,higher,none,higher,none,none,none,none,none,none,none,none,none,higher,none,none,none,higher,none,none,none
+Treg,none,none,none,higher,none,none,none,none,none,higher,none,higher,none,none,none,none,none,none,none,none,none,none,higher,none,none,higher,none,none,none
+Neutrophil,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+plasma,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+undefined,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+B,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+pDC,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
+BnT,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none,none
