@@ -37,7 +37,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('--path_to_data', type=str, default='./train/cell_data.h5ad', help='Path to data file')
     arg_parser.add_argument('--no_labels', action='store_false', help="Flag if there is no labels in the dataset.")
     arg_parser.add_argument("--save_path", type=str, default='', help='Path to save prediction results as '
-                                                                      'csv, if not given the results are bot saved')
+                                                                      'csv, if not given the results are not saved')
 
     args = arg_parser.parse_args()
 
