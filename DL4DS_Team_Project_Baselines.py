@@ -107,7 +107,7 @@ def create_data(ann, true_vals=True):
         data_set.columns = [*data_set.columns[:-1],
                             'type']  # Naming the last column as 'type', can be whatever, but must be consistent with `predicts` argument of cv
     else:
-        data_set = np.c_[np.arcsinh(ann.layers['exprs'] / 5.), ann.obs[
+        data_set = np.c_[ann.layers['exprs'] , ann.obs[
             ['area', 'major_axis_length', 'minor_axis_length', 'eccentricity']],  # Training features
         ]  # Features to be predicted, changed to int values
         data_set = pd.DataFrame(data_set)
